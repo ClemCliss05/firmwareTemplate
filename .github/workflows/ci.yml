@@ -16,6 +16,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Cache build (analysis)
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/tidy
+            build/tests
+          key: ${{ runner.os }}-analysis-${{ hashFiles('**/CMakeLists.txt') }}
+
       - name: Install tools
         run: |
           sudo apt update
@@ -98,6 +106,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Cache build (firmware)
+        uses: actions/cache@v4
+        with:
+          path: build/firmware
+          key: ${{ runner.os }}-firmware-${{ hashFiles('**/CMakeLists.txt') }}
 
       - name: Install ARM toolchain
         run: |
