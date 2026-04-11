@@ -1,73 +1,193 @@
 # Embedded Firmware Template
 
-A clean, modular, and scalable template for embedded firmware development.
+A professional template for embedded firmware development with a strong focus on:
 
-This project is designed to provide a solid foundation for building reliable, testable, and maintainable embedded systems across different microcontrollers.
+- Clean and modular architecture
+- Hardware abstraction
+- Testability without hardware
+- Static analysis and security
+- CI/CD integration
 
 ---
 
-## Features
+## Purpose
 
-- Modular architecture (core / drivers / services / platform)
-- Cross-compilation support (ARM GCC toolchain)
-- Host-based unit testing
-- Lightweight and hardware-agnostic design
-- Easy to extend and reuse across projects
+This project provides a solid foundation to build reliable embedded systems.
+
+Key goals:
+
+- Separate business logic from hardware
+- Enable fast and reproducible testing
+- Improve code quality with static analysis
+- Support scalable and maintainable design
 
 ---
 
 ## Project Structure
 
 ```
-
-firmware/
-core/        # Platform-independent logic
-drivers/     # Hardware drivers
-services/    # High-level modules
-platform/    # MCU-specific code
-app/         # Entry point
-
-tests/         # Unit tests (host)
-cmake/         # Toolchain configuration
-scripts/       # Build and flash scripts
-
-````
-
----
-
-## Build Firmware
-
-```bash
-cmake -B build
-cmake --build build
-````
-
-Outputs:
-
-* `firmware.elf`
-* `firmware.bin`
-* `firmware.hex`
-
----
-
-## Run Tests
-
-```bash
-cmake -B build_tests -DBUILD_TESTS=ON
-cmake --build build_tests
-ctest --test-dir build_tests
+. ├── firmware/
+  |   ├── app/        # Entry point (main)  
+  |   ├── core/       # Hardware-independent modules
+  |   │   ├── logger/
+  |   │   ├── ringbuffer/
+  |   │   └── utils/
+  |   ├── services/   # Business logic 
+  |   │   └── sensor/ 
+  |   ├── drivers/    # Hardware interfaces
+  |   │   ├── gpio/
+  |   │   └── uart/
+  |   └── platform/   # Target-specific implementation
+  |       └── mcu_name/ 
+  |           ├── startup/ 
+  |           ├── linker/ 
+  |           ├── cmsis/ 
+  |           └── clock / interrupt 
+  ├── tests/          # Unit tests (host execution) 
+  ├── scripts/        # Build, analysis and tooling scripts
+  └── cmake/          # Toolchain configuration
 ```
 
 ---
 
-## Goals
+## Build
 
-* Keep core logic independent from hardware
-* Enable fast testing without target hardware
-* Provide a reusable template for embedded projects
+### Firmware (cross-compilation)
+
+```bash
+./scripts/build.sh
+```
+
+Outputs:  
+
+  - .elf
+  - .bin
+  - .hex
+
+---
+
+### Tests (host)
+
+```bash
+cmake -B build/tests -DANALYSIS=ON -DTESTS=ON
+cmake --build build/tests
+ctest --test-dir build/tests
+```
+
+Testing:
+
+  - Framework: GoogleTest  
+  - Scope: core and services  
+  - Runs on host (no hardware required)  
+
+---
+
+### Static Analysis
+
+#### clang-tidy
+
+```bash
+./scripts/clang-tidy.sh
+```
+
+Scope:
+
+  - core
+  - services
+
+#### cppcheck
+
+```bash
+./scripts/cppcheck.sh
+```
+
+Scope:
+
+  - core
+  - services
+  - tests
+
+---
+
+### CodeQL
+
+```bash
+./scripts/codeql.sh
+```
+
+Focus:
+
+  - security vulnerabilities
+  - memory issues
+  - unsafe patterns
+
+---
+
+### CI/CD
+
+GitHub Actions pipeline includes:
+
+#### Analysis job
+
+  - clang-tidy
+  - cppcheck
+  - unit tests (ASAN / UBSAN)
+
+#### Firmware job
+
+  - cross-compilation
+  - generation of .elf, .bin, .hex
+
+#### CodeQL job
+
+  - advanced security analysis
+  - Caching is used to speed up builds.
+
+---
+
+## Development Workflow
+
+### Format code
+
+```bash
+./scripts/clang-format.sh
+```
+
+### Run all static analysis
+
+```bash
+./scripts/static_analysis.sh
+```
+
+### Run tests
+
+```bash
+ctest --test-dir build/tests
+```
+
+---
+
+## Design Principles
+
+- Clear separation of layers
+- Hardware-independent core logic
+- Minimal coupling
+- Testability first
+- Static analysis integration
+
+---
+
+## Roadmap
+
+  - Power optimization strategies
+  - Communication stack integration
+  - RTOS support
+  - Security improvements
 
 ---
 
 ## License
 
 MIT
+
+---

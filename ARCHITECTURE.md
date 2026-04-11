@@ -1,183 +1,169 @@
 # Firmware Architecture
 
-This repository provides a modular and scalable template for embedded firmware development.  
-It is designed to be portable across different microcontrollers and toolchains, while remaining simple and easy to understand.
+## Objective
+
+Provide a clear, modular, and testable architecture for embedded systems.
+
+The design separates hardware-dependent code from portable logic to improve:
+
+- maintainability
+- testability
+- scalability
 
 ---
 
-## Overview
+## Layered Architecture
 
-The project is organized into independent layers with clear responsibilities:
+app ↓ services ↓ core ↓ drivers ↓ platform
 
-- **core**: platform-independent logic
-- **drivers**: low-level hardware interfaces
-- **services**: higher-level features built on top of drivers
-- **platform**: hardware-specific implementation (startup, linker, system)
-- **app**: firmware entry point
-- **tests**: host-based unit tests
-
-This separation ensures good maintainability, testability, and portability.
+Each layer has a single responsibility.
 
 ---
 
-## Directory Structure
+## Core
 
-```
-
-├── cmake/                 # Toolchain and CMake utilities
-├── firmware/
-│   ├── app/               # Application entry point (main)
-│   ├── core/              # Platform-independent logic
-│   ├── drivers/           # Hardware drivers (GPIO, UART, etc.)
-│   ├── services/          # High-level modules (business logic)
-│   └── platform/          # MCU-specific implementation
-├── tests/                 # Unit tests (host execution)
-├── scripts/               # Build and flashing scripts
-└── CMakeLists.txt         # Root build configuration
-
-```
-
----
-
-## Layer Description
-
-### Core
-
-The `core` module contains reusable, platform-independent components.
+- Hardware-independent
+- Fully testable on host
+- No external dependencies
 
 Examples:
-- data structures (ring buffer)
-- logging interfaces
-- utilities
+- ringbuffer
+- logger
+
+---
+
+## Services
+
+- Business logic layer
+- Uses core modules
+- No direct hardware access
+
+Example:
+- sensor abstraction
+
+---
+
+## Drivers
+
+- Low-level hardware access
+- Encapsulates peripherals
+
+Examples:
+- UART
+- GPIO
 
 Constraints:
-- must not depend on hardware
-- must be fully testable on host
+- no business logic
+- minimal complexity
 
 ---
 
-### Drivers
+## Platform
 
-The `drivers` layer provides low-level access to hardware peripherals.
+- Target-specific implementation
+- Not portable
 
-Examples:
-- GPIO
-- UART
-- SPI, I2C (future extensions)
-
-Responsibilities:
-- abstract hardware registers
-- expose simple and reusable APIs
-
----
-
-### Services
-
-The `services` layer implements higher-level features using drivers.
-
-Examples:
-- sensor management
-- communication protocols
-- application logic components
-
-Dependencies:
-- can depend on `core` and `drivers`
-- must remain independent from `platform`
-
----
-
-### Platform
-
-The `platform` layer contains all hardware-specific code required to run the firmware.
-
-Typical content:
+Contains:
 - startup code
-- linker scripts
+- linker script
 - interrupt handling
-- system initialization
-
-This layer is the only one tightly coupled to a specific microcontroller.
+- hardware initialization
 
 ---
 
-### Application
+## App
 
-The `app` module contains the firmware entry point.
-
-Responsibilities:
-- initialize the system
-- configure services and drivers
-- run the main loop
+- Entry point (`main.cpp`)
+- Coordinates system behavior
 
 ---
 
-### Tests
+## Data Flow
 
-The `tests` directory contains unit tests executed on the host machine.
-
-Key points:
-- only `core` and optionally `services` are tested
-- no hardware or platform code is included
-- uses standard C++ toolchain (no cross-compilation)
-
-This enables fast and reliable testing without hardware.
+Input → Service → Core → Driver → Hardware
 
 ---
 
-## Build System
+## Build Modes
 
-The project uses CMake with two main configurations:
+### Firmware Mode
 
-### Firmware Build
+ANALYSIS=OFF
 
-Builds the embedded firmware using a cross-compilation toolchain.
-
-```
-
-cmake -B build -DCMAKE_TOOLCHAIN_FILE=cmake/arm-gcc-toolchain.cmake
-cmake --build build
-
-```
-
-Output:
-- `.elf`
-- `.bin`
-- `.hex`
+- Full build
+- Includes platform and drivers
+- Target: embedded device
 
 ---
 
-### Host Tests Build
+### Analysis Mode
 
-Builds and runs unit tests on the host.
+ANALYSIS=ON
 
-```
-
-cmake -B build_tests -DBUILD_TESTS=ON
-cmake --build build_tests
-ctest --test-dir build_tests
-
-```
-
-Only the following modules are compiled:
+Builds only:
 - core
-- tests
+- services
+- tests (optional)
+
+Used for:
+- unit testing
+- clang-tidy
+- cppcheck
+- CodeQL
 
 ---
 
-## Design Principles
+## Testing Strategy
 
-- Clear separation of concerns
-- Minimal coupling between modules
-- Platform-independent core logic
-- Testability on host
-- Scalable architecture for future features
+- Scope: core and services
+- Executed on host
+- Independent from hardware
+
+Benefits:
+- fast execution
+- deterministic results
+- CI-friendly
 
 ---
 
-## Notes
+## Static Analysis Strategy
 
-- The `platform` layer should be adapted for each target MCU
-- The rest of the architecture remains unchanged across projects
-- New features should be added to `services`, not directly in `app`
+| Tool       | Scope                  |
+|------------|------------------------|
+| clang-tidy | core, services         |
+| cppcheck   | core, services, tests  |
+| CodeQL     | core, services         |
+
+---
+
+## Key Design Choices
+
+### Separation of concerns
+
+- Core does not depend on drivers
+- Services do not access hardware directly
+- Platform is isolated
+
+### Hardware abstraction
+
+- Drivers isolate hardware details
+- Higher layers remain portable
+
+### Testability
+
+- Most code runs without hardware
+- Enables CI integration
+
+---
+
+## Summary
+
+This architecture ensures:
+
+- clean structure
+- strong testability
+- portability
+- readiness for industrial workflows
+
 
 ---
