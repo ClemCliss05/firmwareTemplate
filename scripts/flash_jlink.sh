@@ -1,5 +1,5 @@
 r
-loadfile build/firmwareTemplate.elf
+loadfile build/build_firmware/firmwareTemplate.elf
 r
 g
 exit
