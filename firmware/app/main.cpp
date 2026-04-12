@@ -1,7 +1,7 @@
 #include "logger.hpp"
 #include "ringbuffer.hpp"
-#include "uart/uart.hpp"
-#include "uart/uart_logger_backend.hpp"
+#include "uart.hpp"
+#include "uart_logger_backend.hpp"
 
 static char log_buffer_memory[256];
 
