@@ -72,7 +72,7 @@ target_link_options(platform_mcu_name PUBLIC
     -T${LINKER_SCRIPT}
 
     -Wl,--gc-sections
-    -Wl,-Map=${CMAKE_BINARY_DIR}/${PROJECT_NAME}.map
+    -Wl,-Map=${CMAKE_BINARY_DIR}/firmware.map
 
     --specs=nano.specs
     --specs=nosys.specs
