@@ -15,7 +15,7 @@ add_library(platform_mcu_name STATIC)
 # ------------------------------------------------------------------------------
 
 file(GLOB CMSIS_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/cmsis/source/*.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmsis/device/src/*.c
 )
 
 target_sources(platform_mcu_name PRIVATE
@@ -34,7 +34,8 @@ target_sources(platform_mcu_name PRIVATE
 
 target_include_directories(platform_mcu_name PUBLIC
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/cmsis/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmsis/core
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmsis/device/inc
 )
 
 # ------------------------------------------------------------------------------

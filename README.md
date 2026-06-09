@@ -1,90 +1,102 @@
 # Embedded Firmware Template
 
-A professional template for embedded firmware development with a strong focus on:
+Embedded firmware template focused on:
 
-- Clean and modular architecture
+- Modular architecture
 - Hardware abstraction
-- Testability without hardware
-- Static analysis and security
-- CI/CD integration
+- Host-based testing
+- Static analysis
+- Security
+- CI/CD automation
 
 ---
 
-## Purpose
+## Tools
 
-This project provides a solid foundation to build reliable embedded systems.
+VSCode main extensions:
 
-Key goals:
+- C/C++
+- CMake Tools
+- Cortex-Debug
+- GitHub Actions
+- SARIF Viewer
 
-- Separate business logic from hardware
-- Enable fast and reproducible testing
-- Improve code quality with static analysis
-- Support scalable and maintainable design
+---
+
+## Features
+
+- Layered architecture
+- Cross-compilation support
+- Unit testing with GoogleTest
+- clang-format
+- clang-tidy
+- cppcheck
+- CodeQL
+- GitHub Actions CI
+- ASAN / UBSAN support
+- J-Link flashing scripts
 
 ---
 
 ## Project Structure
 
+```text
+firmware/
+├── app/        # Application entry point
+├── core/       # Hardware-independent modules
+├── services/   # Business logic
+├── drivers/    # Peripheral drivers
+└── platform/   # Target-specific code
+
+tests/          # Host unit tests
+scripts/        # Build and analysis scripts
+cmake/          # Toolchain files
+.github/        # CI/CD workflows
 ```
-. ├── firmware/
-  |   ├── app/        # Entry point (main)  
-  |   ├── core/       # Hardware-independent modules
-  |   │   ├── logger/
-  |   │   ├── ringbuffer/
-  |   │   └── utils/
-  |   ├── services/   # Business logic 
-  |   │   └── sensor/ 
-  |   ├── drivers/    # Hardware interfaces
-  |   │   ├── gpio/
-  |   │   └── uart/
-  |   └── platform/   # Target-specific implementation
-  |       └── mcu_name/ 
-  |           ├── startup/ 
-  |           ├── linker/ 
-  |           ├── cmsis/ 
-  |           └── clock / interrupt 
-  ├── tests/          # Unit tests (host execution) 
-  ├── scripts/        # Build, analysis and tooling scripts
-  └── cmake/          # Toolchain configuration
-```
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for details.
 
 ---
 
-## Build
-
-### Firmware (cross-compilation)
+## Build Firmware
 
 ```bash
 ./scripts/build.sh
 ```
 
-Outputs:  
+Generated files:
 
-  - .elf
-  - .bin
-  - .hex
+```text
+.elf
+.bin
+.hex
+```
 
 ---
 
-### Tests (host)
+## Run Tests
 
 ```bash
-cmake -B build/tests -DANALYSIS=ON -DTESTS=ON
+cmake -B build/tests \
+    -DANALYSIS=ON \
+    -DTESTS=ON
+
 cmake --build build/tests
+
 ctest --test-dir build/tests
 ```
 
-Testing:
-
-  - Framework: GoogleTest  
-  - Scope: core and services  
-  - Runs on host (no hardware required)  
-
 ---
 
-### Static Analysis
+## Static Analysis
 
-#### clang-tidy
+### Format
+
+```bash
+./scripts/clang-format.sh
+```
+
+### clang-tidy
 
 ```bash
 ./scripts/clang-tidy.sh
@@ -92,10 +104,12 @@ Testing:
 
 Scope:
 
-  - core
-  - services
+```text
+core
+services
+```
 
-#### cppcheck
+### cppcheck
 
 ```bash
 ./scripts/cppcheck.sh
@@ -103,11 +117,11 @@ Scope:
 
 Scope:
 
-  - core
-  - services
-  - tests
-
----
+```text
+core
+services
+tests
+```
 
 ### CodeQL
 
@@ -117,77 +131,56 @@ Scope:
 
 Focus:
 
-  - security vulnerabilities
-  - memory issues
-  - unsafe patterns
-
----
-
-### CI/CD
-
-GitHub Actions pipeline includes:
-
-#### Analysis job
-
-  - clang-tidy
-  - cppcheck
-  - unit tests (ASAN / UBSAN)
-
-#### Firmware job
-
-  - cross-compilation
-  - generation of .elf, .bin, .hex
-
-#### CodeQL job
-
-  - advanced security analysis
-  - Caching is used to speed up builds.
-
----
-
-## Development Workflow
-
-### Format code
-
-```bash
-./scripts/clang-format.sh
+```text
+Security
+Memory safety
+Unsafe patterns
 ```
 
-### Run all static analysis
+### Run Everything
 
 ```bash
 ./scripts/static_analysis.sh
 ```
 
-### Run tests
+---
 
-```bash
-ctest --test-dir build/tests
-```
+## CI/CD
+
+GitHub Actions automatically runs:
+
+### Analysis
+
+- clang-tidy
+- cppcheck
+- unit tests
+- ASAN
+- UBSAN
+
+### Firmware
+
+- cross compilation
+- ELF generation
+- BIN generation
+- HEX generation
+
+### Security
+
+- CodeQL analysis
 
 ---
 
-## Design Principles
+## Design Goals
 
-- Clear separation of layers
-- Hardware-independent core logic
-- Minimal coupling
-- Testability first
-- Static analysis integration
-
----
-
-## Roadmap
-
-  - Power optimization strategies
-  - Communication stack integration
-  - RTOS support
-  - Security improvements
+- Separation of concerns
+- Hardware abstraction
+- Testability
+- Maintainability
+- Reproducible builds
+- Security by default
 
 ---
 
 ## License
 
 MIT
-
----
