@@ -24,7 +24,7 @@
 
             "preLaunchTask": "Build Firmware",
 
-            "svdFile": "",
+            "svdFile": "REPLACE_WITH_SVD_FILE_PATH",
 
             "showDevDebugOutput": "raw",
 

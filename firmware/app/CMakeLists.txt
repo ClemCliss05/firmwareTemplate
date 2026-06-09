@@ -4,7 +4,12 @@
 
 add_executable(firmware
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
+)
+
+target_include_directories(firmware PRIVATE
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/inc
 )
 
 # ------------------------------------------------------------------------------
@@ -61,7 +66,7 @@ add_custom_command(TARGET firmware POST_BUILD
 
     # ASM
     COMMAND ${CMAKE_OBJDUMP}
-        -d -S -C
+        -d -S -C -l
         $<TARGET_FILE:firmware>
         > ${CMAKE_BINARY_DIR}/firmware.asm
 

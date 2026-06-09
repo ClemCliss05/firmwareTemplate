@@ -1,112 +1,196 @@
-# Firmware Architecture
+# Architecture
 
-## Objective
+## Overview
 
-Provide a clear, modular, and testable architecture for embedded systems.
+The project follows a layered architecture that separates hardware-dependent code from portable application logic.
 
-The design separates hardware-dependent code from portable logic to improve:
-
-- maintainability
-- testability
-- scalability
-
----
-
-## Layered Architecture
-
-app ↓ services ↓ core ↓ drivers ↓ platform
-
-Each layer has a single responsibility.
+```text
+app
+ ↓
+services
+ ↓
+core
+ ↓
+drivers
+ ↓
+platform
+```
 
 ---
 
-## Core
+## Layers
 
-- Hardware-independent
+### App
+
+Application entry point.
+
+Responsibilities:
+
+- System initialization
+- Component wiring
+- Main execution flow
+
+Files:
+
+```text
+firmware/app
+```
+
+---
+
+### Services
+
+Business logic.
+
+Responsibilities:
+
+- Application behavior
+- Feature implementation
+- High-level workflows
+
+Rules:
+
+- Can use Core
+- Must not access hardware directly
+
+Files:
+
+```text
+firmware/services
+```
+
+---
+
+### Core
+
+Hardware-independent utilities.
+
+Responsibilities:
+
+- Reusable modules
+- Algorithms
+- Generic infrastructure
+
+Examples:
+
+- Logger
+- RingBuffer
+
+Rules:
+
+- No hardware dependencies
 - Fully testable on host
-- No external dependencies
 
-Examples:
-- ringbuffer
-- logger
+Files:
 
----
-
-## Services
-
-- Business logic layer
-- Uses core modules
-- No direct hardware access
-
-Example:
-- sensor abstraction
+```text
+firmware/core
+```
 
 ---
 
-## Drivers
+### Drivers
 
-- Low-level hardware access
-- Encapsulates peripherals
+Hardware abstraction layer.
+
+Responsibilities:
+
+- Peripheral access
+- Hardware interfaces
 
 Examples:
+
 - UART
 - GPIO
 
-Constraints:
-- no business logic
-- minimal complexity
+Rules:
+
+- No business logic
+- Minimal processing
+
+Files:
+
+```text
+firmware/drivers
+```
 
 ---
 
-## Platform
+### Platform
 
-- Target-specific implementation
-- Not portable
+Target-specific implementation.
 
-Contains:
-- startup code
-- linker script
-- interrupt handling
-- hardware initialization
+Responsibilities:
 
----
+- Startup code
+- Interrupt handling
+- Clock configuration
+- Linker script
+- Vendor CMSIS files
 
-## App
+Files:
 
-- Entry point (`main.cpp`)
-- Coordinates system behavior
+```text
+firmware/platform
+```
 
 ---
 
 ## Data Flow
 
-Input → Service → Core → Driver → Hardware
+```text
+Application
+    ↓
+Service
+    ↓
+Core
+    ↓
+Driver
+    ↓
+Hardware
+```
 
 ---
 
 ## Build Modes
 
-### Firmware Mode
+### Firmware Build
 
+```text
 ANALYSIS=OFF
+```
 
-- Full build
-- Includes platform and drivers
-- Target: embedded device
+Builds:
+
+- app
+- services
+- core
+- drivers
+- platform
+
+Target:
+
+```text
+Embedded device
+```
 
 ---
 
-### Analysis Mode
+### Analysis Build
 
+```text
 ANALYSIS=ON
+```
 
-Builds only:
+Builds:
+
 - core
 - services
 - tests (optional)
 
 Used for:
-- unit testing
+
+- Unit tests
 - clang-tidy
 - cppcheck
 - CodeQL
@@ -115,55 +199,65 @@ Used for:
 
 ## Testing Strategy
 
-- Scope: core and services
-- Executed on host
-- Independent from hardware
+Scope:
+
+```text
+core
+services
+```
+
+Execution:
+
+```text
+Host machine
+```
 
 Benefits:
-- fast execution
-- deterministic results
+
+- Fast
+- Deterministic
+- Hardware-independent
 - CI-friendly
 
 ---
 
 ## Static Analysis Strategy
 
-| Tool       | Scope                  |
-|------------|------------------------|
-| clang-tidy | core, services         |
-| cppcheck   | core, services, tests  |
-| CodeQL     | core, services         |
+| Tool | Scope |
+| -------- | -------- |
+| clang-tidy | core, services |
+| cppcheck | core, services, tests |
+| CodeQL | analysis build |
 
 ---
 
-## Key Design Choices
+## Dependency Rules
 
-### Separation of concerns
+Allowed:
 
-- Core does not depend on drivers
-- Services do not access hardware directly
-- Platform is isolated
+```text
+app      → services
+services → core
+drivers  → platform
+```
 
-### Hardware abstraction
+Forbidden:
 
-- Drivers isolate hardware details
-- Higher layers remain portable
-
-### Testability
-
-- Most code runs without hardware
-- Enables CI integration
-
----
-
-## Summary
-
-This architecture ensures:
-
-- clean structure
-- strong testability
-- portability
-- readiness for industrial workflows
-
+```text
+core     → drivers
+core     → platform
+services → platform
+services → hardware
+```
 
 ---
+
+## Goal
+
+Provide a firmware foundation that is:
+
+- Portable
+- Testable
+- Maintainable
+- Scalable
+- CI/CD friendly

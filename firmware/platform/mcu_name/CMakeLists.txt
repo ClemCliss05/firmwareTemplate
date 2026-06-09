@@ -15,13 +15,13 @@ add_library(platform_mcu_name STATIC)
 # ------------------------------------------------------------------------------
 
 file(GLOB CMSIS_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/cmsis/source/*.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmsis/device/src/*.c
 )
 
 target_sources(platform_mcu_name PRIVATE
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/clock.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/interrupt.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform_drivers/clock/clock.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform_drivers/interrupt/interrupt.cpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/startup/startup_mcu_name.s
 
@@ -34,7 +34,11 @@ target_sources(platform_mcu_name PRIVATE
 
 target_include_directories(platform_mcu_name PUBLIC
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/cmsis/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform_drivers/clock
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform_drivers/interrupt
+    
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmsis/core
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmsis/device/inc
 )
 
 # ------------------------------------------------------------------------------
