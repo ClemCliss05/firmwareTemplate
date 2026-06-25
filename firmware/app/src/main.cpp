@@ -5,18 +5,26 @@
 
 static char log_buffer_memory[256];
 
-static RingBuffer log_buffer(log_buffer_memory, sizeof(log_buffer_memory));
+static RingBuffer log_buffer(
+    log_buffer_memory,
+    sizeof(log_buffer_memory));
 
-static UartLoggerBackend uart_backend;
+static Drivers::Uart uart;
 
-static Logger logger(log_buffer, uart_backend);
+static UartLoggerBackend uart_backend(uart);
 
-int main() {
-    uart_init();
+static Logger logger(
+    log_buffer,
+    uart_backend);
+
+int main()
+{
+    uart.init();
 
     LOG_INFO("System boot\n");
 
-    while (1) {
+    while (true)
+    {
         LOG_DEBUG("loop\n");
 
         logger.flush();

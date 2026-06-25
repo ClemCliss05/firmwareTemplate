@@ -1,6 +1,12 @@
 #include "uart_logger_backend.hpp"
-#include "uart.hpp"
 
-void UartLoggerBackend::write(char c) {
-    uart_write_byte(c);
+UartLoggerBackend::UartLoggerBackend(
+    Drivers::Uart& uart)
+    : uart_(uart)
+{
+}
+
+void UartLoggerBackend::write(char c)
+{
+    uart_.writeByte(static_cast<uint8_t>(c));
 }

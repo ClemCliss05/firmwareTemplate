@@ -6,19 +6,22 @@
 
 #include <string>
 
-class FakeBackend : public LoggerBackend {
-  public:
+class FakeBackend : public ILoggerBackend
+{
+public:
     std::string out;
 
-    void write(char c) override {
+    void write(char c) override
+    {
         out.push_back(c);
     }
 };
 
-TEST(LoggerTest, LogMessage) {
+TEST(LoggerTest, LogMessage)
+{
     char mem[64];
 
-    RingBuffer rb(mem, 64);
+    RingBuffer rb(mem, sizeof(mem));
 
     FakeBackend backend;
 
